@@ -35,12 +35,15 @@ p { margin: 0 0 9pt; text-align: justify; hyphens: auto; }
 
 /* ---------- cover ---------- */
 
+/* Block flow, not flex. A flex container with a fixed height paginates
+ * badly in print: when the box meets the page edge its children are laid
+ * out as though the break were not there and end up drawn on top of
+ * whatever follows. Padding gives the same placement and breaks cleanly. */
 .cover {
-  height: 247mm;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  padding-top: 52mm;
+  padding-bottom: 10mm;
   page-break-after: always;
+  break-after: page;
   text-align: left;
 }
 
@@ -53,7 +56,15 @@ p { margin: 0 0 9pt; text-align: justify; hyphens: auto; }
   margin-bottom: 10mm;
 }
 
+/* The generic h1 rule further down forces a page break before every h1
+ * and draws a rule under it. Neither belongs on the cover: the forced
+ * break was tearing the title off the cover page entirely, and the cover
+ * already has its own short rule. */
 .cover h1 {
+  page-break-before: auto;
+  break-before: auto;
+  border-bottom: none;
+  padding-bottom: 0;
   font-family: var(--sans);
   font-size: 34pt;
   line-height: 1.1;
@@ -121,20 +132,28 @@ b, strong { color: #0d1821; }
 
 /* ---------- contents ---------- */
 
-.toc { font-family: var(--sans); font-size: 10.5pt; }
-.toc ol { list-style: none; padding: 0; counter-reset: sec; }
+.toc { font-family: var(--sans); font-size: 10.5pt; margin-top: 7mm; }
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: sec; }
+
+/* Keep a section and its subsections together where they fit, so the
+ * contents never breaks in the middle of one entry. */
 .toc > ol > li {
   counter-increment: sec;
-  margin-bottom: 2.5mm;
+  margin-bottom: 5mm;
   font-weight: 600;
+  line-height: 1.5;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 .toc > ol > li::before { content: counter(sec) ".  "; color: var(--accent); }
-.toc ol ol { padding-left: 8mm; counter-reset: sub; margin-top: 1.5mm; }
+
+.toc ol ol { padding-left: 9mm; counter-reset: sub; margin-top: 2.5mm; }
 .toc ol ol li {
   counter-increment: sub;
   font-weight: 400;
   color: var(--soft);
-  margin-bottom: 1.2mm;
+  margin-bottom: 2mm;
+  line-height: 1.45;
 }
 .toc ol ol li::before { content: counter(sec) "." counter(sub) "  "; }
 
@@ -901,7 +920,7 @@ docs/
 README.md</code></pre>
 <h2>8.3 Commit history</h2>
 <p>Every commit is authored solely by the student. No co-author trailer was added and no collaborator was added to the GitHub project, as required by the brief.</p>
-<table><thead><tr><th>Commit</th><th>Date</th><th>Subject</th></tr></thead><tbody><tr><td><span class="mono">a085257</span></td><td>06 Nov 2026</td><td>v0.1: DFS trace table matching the lecture notes</td></tr><tr><td><span class="mono">a753477</span></td><td>06 Nov 2026</td><td>v0.2: draw the cave, and draw the stack as the diver's rope</td></tr><tr><td><span class="mono">9428092</span></td><td>06 Nov 2026</td><td>v0.3: the playground - change the cave, watch DFS react</td></tr><tr><td><span class="mono">1842c5e</span></td><td>07 Nov 2026</td><td>v0.4: Dive mode - the player is the diver</td></tr><tr><td><span class="mono">84f5a28</span></td><td>07 Nov 2026</td><td>v0.5: Race mode - DFS against BFS and iterative deepening</td></tr><tr><td><span class="mono">3841da0</span></td><td>07 Nov 2026</td><td>v1.0: Learn mode, live pseudocode, and polish</td></tr><tr><td><span class="mono">9024d99</span></td><td>07 Nov 2026</td><td>Add the project report and the tooling that builds it</td></tr><tr><td><span class="mono">6b96859</span></td><td>07 Nov 2026</td><td>Add GitHub Pages deployment workflow</td></tr></tbody></table>
+<table><thead><tr><th>Commit</th><th>Date</th><th>Subject</th></tr></thead><tbody><tr><td><span class="mono">a085257</span></td><td>06 Nov 2026</td><td>v0.1: DFS trace table matching the lecture notes</td></tr><tr><td><span class="mono">a753477</span></td><td>06 Nov 2026</td><td>v0.2: draw the cave, and draw the stack as the diver's rope</td></tr><tr><td><span class="mono">9428092</span></td><td>06 Nov 2026</td><td>v0.3: the playground - change the cave, watch DFS react</td></tr><tr><td><span class="mono">1842c5e</span></td><td>07 Nov 2026</td><td>v0.4: Dive mode - the player is the diver</td></tr><tr><td><span class="mono">84f5a28</span></td><td>07 Nov 2026</td><td>v0.5: Race mode - DFS against BFS and iterative deepening</td></tr><tr><td><span class="mono">3841da0</span></td><td>07 Nov 2026</td><td>v1.0: Learn mode, live pseudocode, and polish</td></tr><tr><td><span class="mono">9024d99</span></td><td>07 Nov 2026</td><td>Add the project report and the tooling that builds it</td></tr><tr><td><span class="mono">6b96859</span></td><td>07 Nov 2026</td><td>Add GitHub Pages deployment workflow</td></tr><tr><td><span class="mono">a7abd8e</span></td><td>07 Nov 2026</td><td>Regenerate the report with the live site and repository URLs</td></tr></tbody></table>
 <h1>9. Assessing the AI’s Contribution</h1>
 <p class="lede">The brief states that the evaluation is of the thought process and the refinement, not of whether an AI can write a search algorithm. This section is therefore an honest account of what the assistant produced unaided, what had to be corrected, and where human direction changed the outcome.</p>
 <h2>9.1 What the AI produced well without correction</h2>
