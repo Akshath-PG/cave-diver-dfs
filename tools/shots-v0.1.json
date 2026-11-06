@@ -1,0 +1,17 @@
+{
+  "shots": [
+    {
+      "name": "v0.1-a-initial",
+      "width": 1000,
+      "height": 420
+    },
+    {
+      "name": "v0.1-b-trace",
+      "width": 1000,
+      "height": 900,
+      "fullPage": true,
+      "steps": [{ "click": "#run" }],
+      "dump": "#trace"
+    }
+  ]
+}

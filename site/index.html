@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DFS Trace</title>
+</head>
+<body>
+<h1>Depth-First Search</h1>
+<p>State space: A &rarr; {B, C}, B &rarr; {D, E}, D &rarr; {F}, C, E, F &rarr; { }</p>
+<button id="run">Run DFS</button>
+<table id="trace" border="1" cellpadding="4">
+  <thead>
+    <tr><th>Step</th><th>Current State</th><th>Action Performed</th><th>Stack (Current Path)</th><th>Visited Set</th></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+// The state space from the lecture notes (Lecture 3).
+var GRAPH = {
+  A: ["B", "C"],
+  B: ["D", "E"],
+  C: [],
+  D: ["F"],
+  E: [],
+  F: []
+};
+
+// The algorithm, exactly as written in the notes:
+//   Visit current state. Mark it visited. Push it onto the stack.
+//   If an unvisited neighbouring state exists, go there. Otherwise pop. Return. Repeat.
+function runDFS(graph, start) {
+  var steps = [];
+  var stack = [];
+  var visited = [];
+
+  stack.push(start);
+  visited.push(start);
+  steps.push({
+    current: start,
+    action: "Visit " + start + ", Push " + start,
+    stack: stack.slice(),
+    visited: visited.slice()
+  });
+
+  while (stack.length > 0) {
+    var current = stack[stack.length - 1];
+    var neighbours = graph[current] || [];
+    var next = null;
+
+    for (var i = 0; i < neighbours.length; i++) {
+      if (visited.indexOf(neighbours[i]) === -1) {
+        next = neighbours[i];
+        break;
+      }
+    }
+
+    if (next !== null) {
+      visited.push(next);
+      stack.push(next);
+      steps.push({
+        current: next,
+        action: "From " + current + ", choose " + next + ". Visit " + next + ", Push " + next,
+        stack: stack.slice(),
+        visited: visited.slice()
+      });
+    } else {
+      stack.pop();
+      var returnedTo = stack.length > 0 ? stack[stack.length - 1] : null;
+      steps.push({
+        current: returnedTo === null ? "—" : returnedTo,
+        action: returnedTo === null
+          ? current + " has no unexplored actions. Pop " + current + ". Search terminates."
+          : current + " has no unexplored actions. Pop " + current + " and return to " + returnedTo,
+        stack: stack.slice(),
+        visited: visited.slice()
+      });
+    }
+  }
+
+  return steps;
+}
+
+function render() {
+  var steps = runDFS(GRAPH, "A");
+  var body = document.querySelector("#trace tbody");
+  body.innerHTML = "";
+
+  for (var i = 0; i < steps.length; i++) {
+    var s = steps[i];
+    var row = document.createElement("tr");
+    var sortedVisited = s.visited.slice().sort();
+    row.innerHTML =
+      "<td>" + i + "</td>" +
+      "<td>" + s.current + "</td>" +
+      "<td>" + s.action + "</td>" +
+      "<td>[" + s.stack.join(", ") + "]</td>" +
+      "<td>{" + sortedVisited.join(", ") + "}</td>";
+    body.appendChild(row);
+  }
+}
+
+document.getElementById("run").addEventListener("click", render);
+</script>
+</body>
+</html>
