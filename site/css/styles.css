@@ -85,13 +85,19 @@ body {
 
 .stage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 20px;
+  grid-template-columns: 252px minmax(0, 1fr) 320px;
+  gap: 18px;
   align-items: start;
 }
 
-@media (max-width: 1040px) {
+@media (max-width: 1280px) {
+  .stage { grid-template-columns: 240px minmax(0, 1fr); }
+  .panel-stack { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+
+@media (max-width: 860px) {
   .stage { grid-template-columns: minmax(0, 1fr); }
+  .panel-stack { grid-template-columns: minmax(0, 1fr); }
 }
 
 .card {
@@ -129,33 +135,67 @@ body {
   background:
     radial-gradient(700px 420px at 50% 0%, rgba(26,78,104,0.42), transparent 70%),
     linear-gradient(180deg, #0b2230 0%, #061119 100%);
-  min-height: 420px;
+  height: 60vh;
+  min-height: 400px;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  scroll-behavior: smooth;
 }
 
-#cave {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 62vh;
+#cave { display: block; margin: auto; flex: 0 0 auto; }
+
+.too-big {
+  margin: auto;
+  text-align: center;
+  padding: 30px 34px;
+  max-width: 460px;
 }
 
+.too-big-number {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 44px;
+  font-weight: 650;
+  color: var(--gold);
+  letter-spacing: -0.02em;
+}
+
+.too-big-label {
+  margin: 2px 0 16px;
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.too-big-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #c3dae4;
+}
+
+.cave-frame::-webkit-scrollbar { width: 10px; height: 10px; }
+.cave-frame::-webkit-scrollbar-thumb {
+  background: #27566d; border-radius: 6px;
+}
+.cave-frame::-webkit-scrollbar-track { background: transparent; }
+
+/* Stroke widths are set as attributes in cave.js so they can scale with
+ * chamber size; CSS only carries colour, or it would override them. */
 .layer-passages .passage-wall {
   stroke: #0a1c26;
-  stroke-width: 15;
   stroke-linecap: round;
 }
 
 .layer-passages .passage {
   stroke: #24536b;
-  stroke-width: 6;
   stroke-linecap: round;
-  transition: stroke 240ms ease, stroke-width 240ms ease;
+  transition: stroke 240ms ease;
 }
 
-.layer-passages .passage.is-lit {
-  stroke: #3f88a8;
-  stroke-width: 7;
-}
+.layer-passages .passage.is-lit { stroke: #4894b5; }
 
 .crawlway {
   fill: none;
@@ -169,21 +209,18 @@ body {
 .rope {
   fill: none;
   stroke: var(--rope);
-  stroke-width: 4.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: all 200ms ease;
+  transition: stroke 200ms ease;
 }
 
 .rope-glow {
   fill: none;
   stroke: var(--rope);
-  stroke-width: 13;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: 0.16;
+  opacity: 0.17;
   filter: blur(2px);
-  transition: all 200ms ease;
 }
 
 /* chambers */
@@ -208,7 +245,6 @@ body {
 .chamber-label {
   fill: #7fa0b1;
   font-family: var(--mono);
-  font-size: 14px;
   font-weight: 600;
   text-anchor: middle;
   pointer-events: none;
@@ -349,6 +385,7 @@ button.primary:hover:not(:disabled) { background: var(--rope-bright); }
 /* ---------- log ---------- */
 
 .log {
+  position: relative;
   max-height: 200px;
   overflow-y: auto;
   font-size: 13px;
@@ -404,3 +441,150 @@ button.primary:hover:not(:disabled) { background: var(--rope-bright); }
 
 .status-line .tag.visit { background: #1f4a3a; color: #8fe0b4; }
 .status-line .tag.pop { background: #4a2f1f; color: #ffbe8f; }
+.status-line .tag.cutoff { background: #4a1f28; color: #ffa8b4; }
+
+/* ---------- conditions panel ---------- */
+
+.control-list { display: grid; gap: 15px; }
+
+.preset-row { display: flex; gap: 7px; flex-wrap: wrap; }
+
+button.mini {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 7px;
+}
+
+.control { display: grid; gap: 6px; }
+
+.control.is-off { opacity: 0.4; }
+
+.control label {
+  font-size: 12.5px;
+  color: #b7d0dc;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.control label b { color: var(--rope); font-family: var(--mono); font-weight: 600; }
+
+.control output {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--gold);
+  background: #13303f;
+  border-radius: 5px;
+  padding: 1px 7px;
+}
+
+.control input[type="range"] { width: 100%; accent-color: var(--rope); }
+
+.control select {
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: #12303f;
+  border: 1px solid #2a637e;
+  border-radius: 7px;
+  padding: 6px 8px;
+  width: 100%;
+}
+
+.hint {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12.5px;
+  color: #b7d0dc;
+  cursor: pointer;
+}
+
+.toggle.is-off { opacity: 0.4; }
+
+.toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--rope);
+  cursor: pointer;
+}
+
+/* ---------- readings ---------- */
+
+.readings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-bottom: 12px;
+}
+
+.reading {
+  background: rgba(9,26,36,0.6);
+  border: 1px solid #1d4154;
+  border-radius: 9px;
+  padding: 8px 10px;
+  display: grid;
+  gap: 2px;
+}
+
+.r-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.r-value {
+  font-family: var(--mono);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.r-value.rope { color: var(--rope); }
+
+.verdict-label {
+  margin: 0 0 6px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.verdict {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #c6dde7;
+  background: rgba(9,26,36,0.5);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px;
+}
+
+.verdict.is-warn { border-left-color: var(--gold); color: #f0e0c0; }
+.verdict.is-bad { border-left-color: var(--danger); color: #f6d2cf; }
+
+/* ---------- clickable chambers ---------- */
+
+/* The endless shaft: drawn tight and dim so it reads as a bottomless
+ * descent rather than as ordinary chambers. */
+.chamber.is-shaft .chamber-body {
+  fill: #0d2331;
+  stroke: #1b3f52;
+  stroke-width: 1;
+}
+.chamber.is-shaft.is-visited .chamber-body { fill: #11384a; stroke: #35758f; }
+.chamber.is-shaft.is-on-rope .chamber-body { stroke: var(--rope); }
+.chamber.is-shaft .chamber-marker { r: 1.4; }
+
+.chamber-hit { fill: transparent; cursor: pointer; }
+.chamber.is-clickable { cursor: pointer; }
+.chamber.is-clickable:hover .chamber-body { stroke: var(--gold); }

@@ -1,0 +1,61 @@
+{
+  "shots": [
+    {
+      "name": "v0.3-a-playground",
+      "width": 1500,
+      "height": 980,
+      "dump": "#verdict"
+    },
+    {
+      "name": "v0.3-b-big-cave",
+      "width": 1500,
+      "height": 980,
+      "steps": [
+        { "click": "#preset-random" },
+        { "eval": "document.getElementById('branching').value=3;document.getElementById('branching').dispatchEvent(new Event('input'))" },
+        { "eval": "document.getElementById('depth').value=5;document.getElementById('depth').dispatchEvent(new Event('input'))" },
+        { "eval": "document.getElementById('speed').value=12;document.getElementById('play').click()" },
+        { "wait": 2600 },
+        { "eval": "document.getElementById('play').click()" }
+      ],
+      "dump": "#verdict"
+    },
+    {
+      "name": "v0.3-e-too-big",
+      "width": 1500,
+      "height": 980,
+      "steps": [
+        { "click": "#preset-random" },
+        { "eval": "document.getElementById('branching').value=5;document.getElementById('branching').dispatchEvent(new Event('input'))" },
+        { "eval": "document.getElementById('depth').value=8;document.getElementById('depth').dispatchEvent(new Event('input'))" }
+      ],
+      "dump": "#too-big-text"
+    },
+    {
+      "name": "v0.3-c-no-markers",
+      "width": 1500,
+      "height": 980,
+      "steps": [
+        { "eval": "document.getElementById('markers').checked=false;document.getElementById('markers').dispatchEvent(new Event('input'))" },
+        { "eval": "document.getElementById('speed').value=12;document.getElementById('play').click()" },
+        { "wait": 2200 },
+        { "eval": "document.getElementById('play').click()" }
+      ],
+      "dump": "#verdict"
+    },
+    {
+      "name": "v0.3-d-endless",
+      "width": 1500,
+      "height": 980,
+      "steps": [
+        { "click": "#preset-random" },
+        { "eval": "document.getElementById('endless').checked=true;document.getElementById('endless').dispatchEvent(new Event('input'))" },
+        { "eval": "document.getElementById('treasure').value='shallow-far';document.getElementById('treasure').dispatchEvent(new Event('input'))" },
+        { "eval": "document.getElementById('speed').value=12;document.getElementById('play').click()" },
+        { "wait": 3000 },
+        { "eval": "document.getElementById('play').click()" }
+      ],
+      "dump": "#verdict"
+    }
+  ]
+}

@@ -64,7 +64,7 @@ window.CAVE = window.CAVE || {};
     }
 
     function markVisited(id) {
-      visited.push(id);
+      if (!visitedSet[id]) visited.push(id);
       visitedSet[id] = true;
     }
 
@@ -93,7 +93,12 @@ window.CAVE = window.CAVE || {};
         for (var i = 0; i < neighbours.length; i++) {
           var n = neighbours[i];
           if (!graph.nodes[n]) continue;
-          var blocked = useVisited ? visitedSet[n] : (stack.indexOf(n) !== -1);
+          // With markers switched off the diver has no way of telling an
+          // already-searched chamber from a new one, so nothing is ever
+          // blocked. On any cave this makes the search non-terminating:
+          // that is exactly why the notes list the visited set as an
+          // ingredient of the algorithm rather than an optimisation.
+          var blocked = useVisited ? visitedSet[n] : false;
           if (!blocked) { next = n; break; }
         }
       } else if (graph.nodes[current].neighbours.length > 0) {
