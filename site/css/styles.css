@@ -98,6 +98,11 @@ body {
 @media (max-width: 860px) {
   .stage { grid-template-columns: minmax(0, 1fr); }
   .panel-stack { grid-template-columns: minmax(0, 1fr); }
+  /* On a phone the cave comes first. Stacking the controls above it
+   * pushes the thing the page is about off the bottom of the screen. */
+  .stage > section { order: 1; }
+  .stage > aside { order: 2; }
+  .cave-frame { height: 46vh; min-height: 320px; }
 }
 
 .card {
@@ -274,8 +279,10 @@ body {
   filter: url(#softGlow);
 }
 
-.diver-body { fill: #ffe0b0; stroke: #c9762a; stroke-width: 2; }
-.diver-eye { fill: #3a2410; }
+.diver-body { fill: #1f5a6e; stroke: #ffd9a8; stroke-width: 1.6; }
+.diver-head { fill: #ffe0b0; stroke: #c9762a; stroke-width: 1.2; }
+.diver-mask { fill: #3a6f88; }
+.diver-fin { fill: #14455a; stroke: #ffd9a8; stroke-width: 1.2; }
 .diver, .lamp { transition: transform 220ms ease, opacity 220ms ease; }
 
 /* ---------- controls ---------- */
@@ -767,6 +774,233 @@ button.primary.is-blocked:hover:not(:disabled) { background: #35454f; }
   stroke-width: 2.5;
 }
 .chamber.is-frontier .chamber-marker { fill: var(--teal); }
+
+/* ---------- pseudocode panel ---------- */
+
+.pseudo {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.5;
+  counter-reset: pseudo;
+}
+
+.pseudo li {
+  padding: 3px 8px 3px 26px;
+  border-radius: 5px;
+  color: #9fbccb;
+  position: relative;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.pseudo li::before {
+  counter-increment: pseudo;
+  content: counter(pseudo);
+  position: absolute;
+  left: 7px;
+  color: #4d6f80;
+}
+
+.pseudo li.ind { padding-left: 40px; }
+.pseudo li.ind2 { padding-left: 54px; }
+.pseudo li b { color: var(--rope); font-weight: 600; }
+
+.pseudo li.is-active {
+  background: rgba(240,148,60,0.16);
+  color: #ffe6c7;
+}
+
+/* ---------- learn page ---------- */
+
+.prose {
+  max-width: 860px;
+  margin: 0 auto;
+  font-size: 15px;
+  line-height: 1.72;
+  color: #cfe0e9;
+}
+
+.prose h2 {
+  margin: 42px 0 14px;
+  font-size: 21px;
+  font-weight: 650;
+  color: var(--ink);
+  letter-spacing: -0.012em;
+}
+
+.prose h2:first-child { margin-top: 6px; }
+.prose p { margin: 0 0 15px; }
+.prose b { color: var(--ink); font-weight: 600; }
+
+.prose ul { margin: 0 0 15px; padding-left: 20px; }
+.prose li { margin-bottom: 7px; }
+
+.closing {
+  border-left: 3px solid var(--rope);
+  padding: 2px 0 2px 15px;
+  color: #e5d3bd;
+}
+
+.code {
+  background: rgba(6,18,26,0.7);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 15px 17px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: #bfe0ee;
+  overflow-x: auto;
+  margin: 0 0 15px;
+}
+
+.ingredients {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ingredient {
+  background: rgba(14,33,45,0.7);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 13px 15px;
+}
+
+.ing-title {
+  margin: 0 0 5px !important;
+  color: var(--rope);
+  font-weight: 600;
+  font-size: 13.5px;
+}
+
+.ingredient p:last-child { margin: 0; font-size: 13px; line-height: 1.55; }
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+table.trace, table.props {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+table.trace th, table.props th {
+  text-align: left;
+  padding: 10px 13px;
+  background: rgba(6,18,26,0.6);
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+table.trace td, table.props td {
+  padding: 9px 13px;
+  border-top: 1px solid rgba(29,65,84,0.65);
+  vertical-align: top;
+}
+
+table.trace .mono { font-family: var(--mono); font-size: 12px; color: var(--gold); }
+table.trace tr.kind-pop td { color: #9fc0cf; }
+
+table.props th { width: 110px; vertical-align: top; background: transparent; }
+
+.verdict-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 650;
+  padding: 2px 8px;
+  border-radius: 5px;
+  margin-right: 8px;
+  font-family: var(--mono);
+}
+
+.verdict-chip.no { background: #4a2228; color: #ffb3ad; }
+.verdict-chip.yes { background: #1f4a3a; color: #8fe0b4; }
+.verdict-chip.warn { background: #4a3a1f; color: #ffd9a8; }
+
+.calc {
+  background: rgba(14,33,45,0.7);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 17px;
+  margin-bottom: 16px;
+}
+
+.calc-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.calc-out {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.calc-figure {
+  background: rgba(6,18,26,0.55);
+  border-radius: 9px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+}
+
+.calc-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.calc-value { font-family: var(--mono); font-size: 25px; font-weight: 650; }
+.calc-value.bad { color: var(--danger); }
+.calc-value.good { color: var(--teal); }
+
+.calc-note { margin: 14px 0 0 !important; font-size: 13px; color: #b7d0dc; }
+
+.choose {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.choose-col {
+  background: rgba(14,33,45,0.7);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 13px 15px;
+}
+
+.choose-title { margin: 0 0 8px !important; font-weight: 600; color: var(--gold); font-size: 13.5px; }
+.choose-col ul { margin: 0; padding-left: 18px; }
+.choose-col li { font-size: 13px; margin-bottom: 5px; }
+
+.apps li { font-size: 14px; }
+
+/* ---------- footer ---------- */
+
+.site-foot {
+  border-top: 1px solid var(--line);
+  margin-top: 40px;
+  padding: 22px;
+  text-align: center;
+}
+
+.site-foot p {
+  margin: 0 auto;
+  max-width: 62ch;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
 
 @media (prefers-reduced-motion: reduce) {
   .chamber.is-legal .chamber-body { animation: none; stroke-opacity: 1; }

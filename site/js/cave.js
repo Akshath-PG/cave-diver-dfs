@@ -182,7 +182,21 @@ window.CAVE = window.CAVE || {};
 
       state.lamp = el('circle', { class: 'lamp', r: Math.max(34, r * 3.6), fill: 'url(#lampGlow)' });
       state.diver = el('g', { class: 'diver' });
-      state.diver.appendChild(el('circle', { class: 'diver-body', r: Math.max(5, r * 0.5) }));
+      var dr = Math.max(7, r * 0.62);
+      state.diver.appendChild(el('path', {
+        class: 'diver-fin',
+        d: 'M' + (-dr * 0.75) + ',0 L' + (-dr * 1.5) + ',' + (-dr * 0.55) +
+           ' L' + (-dr * 1.5) + ',' + (dr * 0.55) + ' Z'
+      }));
+      state.diver.appendChild(el('ellipse', {
+        class: 'diver-body', rx: dr, ry: dr * 0.66
+      }));
+      state.diver.appendChild(el('circle', {
+        class: 'diver-head', r: dr * 0.42, cx: dr * 0.72, cy: -dr * 0.2
+      }));
+      state.diver.appendChild(el('circle', {
+        class: 'diver-mask', r: dr * 0.17, cx: dr * 0.92, cy: -dr * 0.24
+      }));
       groups.diver.appendChild(state.lamp);
       groups.diver.appendChild(state.diver);
 

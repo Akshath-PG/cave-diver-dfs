@@ -23,6 +23,7 @@
       <button class="mode is-active" data-view="dive">Dive</button>
       <button class="mode" data-view="playground">Playground</button>
       <button class="mode" data-view="race">Race</button>
+      <button class="mode" data-view="learn">Learn</button>
     </nav>
   </header>
 
@@ -246,6 +247,22 @@
         </section>
 
         <section class="card">
+          <div class="card-head"><h2>The Algorithm</h2></div>
+          <div class="card-body">
+            <ol class="pseudo" id="pseudo">
+              <li data-line="1">visit start, mark it, <b>push</b> it</li>
+              <li data-line="2">repeat:</li>
+              <li data-line="3" class="ind">current &larr; top of stack</li>
+              <li data-line="4" class="ind">if current has an unvisited neighbour n:</li>
+              <li data-line="5" class="ind2">visit n, mark it, <b>push</b> n</li>
+              <li data-line="6" class="ind">else:</li>
+              <li data-line="7" class="ind2"><b>pop</b> &mdash; follow the rope back</li>
+              <li data-line="8">until the stack is empty</li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="card">
           <div class="card-head">
             <h2>The Rope &mdash; Stack</h2>
             <span class="chip" id="stack-depth">0</span>
@@ -374,7 +391,204 @@
 
   </section>
 
+  <!-- ===================== LEARN ===================== -->
+  <section class="view" id="view-learn" hidden>
+    <article class="prose">
+
+      <h2>What the diver is actually doing</h2>
+      <p>
+        An agent with a goal and no map has only one honest option: explore
+        systematically. Depth-first search is the most committed version of that
+        idea. Faced with several passages, it picks one and follows it to the end
+        before considering any other.
+      </p>
+      <p>
+        Chambers are <b>states</b>. Passages are <b>actions</b>. The rope is the
+        <b>stack</b>. The markers are the <b>visited set</b>. Nothing in the game
+        is decoration: each piece is a part of the algorithm wearing a costume.
+      </p>
+
+      <h2>Three ingredients</h2>
+      <div class="ingredients">
+        <div class="ingredient">
+          <p class="ing-title">The state space</p>
+          <p>Every chamber the diver could stand in, and every passage out of it.</p>
+        </div>
+        <div class="ingredient">
+          <p class="ing-title">The visited set</p>
+          <p>What has already been fully searched. Without it the search never ends.</p>
+        </div>
+        <div class="ingredient">
+          <p class="ing-title">The stack</p>
+          <p>Unfinished decisions, newest first. The rope behind the diver.</p>
+        </div>
+      </div>
+
+      <h2>The algorithm</h2>
+      <pre class="code">visit the starting chamber, mark it, push it
+repeat:
+    current &larr; top of stack
+    if current has a neighbour that is not marked:
+        visit it, mark it, push it          &larr; go deeper
+    else:
+        pop current                          &larr; follow the rope back
+until the stack is empty</pre>
+      <p>
+        The stack holds only the path the diver is standing on, not every chamber
+        he has discovered. That single detail is the reason the memory cost is
+        O(m) rather than O(b&times;m), and it is what separates DFS from BFS more
+        than the order of exploration does.
+      </p>
+
+      <h2>Worked trace</h2>
+      <p>
+        The state space from the lecture: A &rarr; {B, C}, B &rarr; {D, E},
+        D &rarr; {F}, and C, E, F lead nowhere. Every row below is produced by the
+        same code the game runs.
+      </p>
+      <div class="table-wrap">
+        <table class="trace" id="learn-trace">
+          <thead>
+            <tr>
+              <th>Step</th><th>Current</th><th>Action</th>
+              <th>Stack (current path)</th><th>Visited set</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h2>What it costs</h2>
+      <p>
+        Let <b>b</b> be the average number of passages out of a chamber and
+        <b>m</b> the greatest depth. Move the sliders and watch the two numbers
+        pull apart.
+      </p>
+      <div class="calc">
+        <div class="calc-controls">
+          <div class="control">
+            <label for="calc-b">Branching factor <b>b</b> <output id="calc-b-out">4</output></label>
+            <input id="calc-b" type="range" min="2" max="10" value="4">
+          </div>
+          <div class="control">
+            <label for="calc-m">Maximum depth <b>m</b> <output id="calc-m-out">20</output></label>
+            <input id="calc-m" type="range" min="2" max="30" value="20">
+          </div>
+        </div>
+        <div class="calc-out">
+          <div class="calc-figure">
+            <span class="calc-label">Chambers it may enter &mdash; time O(b<sup>m</sup>)</span>
+            <span class="calc-value bad" id="calc-time">1.1 trillion</span>
+          </div>
+          <div class="calc-figure">
+            <span class="calc-label">Chambers it must remember &mdash; space O(m)</span>
+            <span class="calc-value good" id="calc-space">20</span>
+          </div>
+        </div>
+        <p class="calc-note" id="calc-note"></p>
+      </div>
+
+      <h2>Is it any good?</h2>
+      <div class="table-wrap">
+        <table class="props">
+          <tbody>
+            <tr>
+              <th>Complete?</th>
+              <td><span class="verdict-chip no">No</span>
+                Down an infinitely long passage it commits forever and never
+                returns. Try the endless passage in the Playground.</td>
+            </tr>
+            <tr>
+              <th>Optimal?</th>
+              <td><span class="verdict-chip no">No</span>
+                With one charging station three moves away and another twenty,
+                DFS can reach the twenty-move one first and stop there.</td>
+            </tr>
+            <tr>
+              <th>Time</th>
+              <td><span class="verdict-chip warn">O(b<sup>m</sup>)</span>
+                In the worst case it enters nearly every chamber. DFS changes the
+                order of exploration; it does not reduce how many states exist.</td>
+            </tr>
+            <tr>
+              <th>Space</th>
+              <td><span class="verdict-chip yes">O(m)</span>
+                Only the current path. This is where DFS wins, and it wins big.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Choosing between them</h2>
+      <div class="choose">
+        <div class="choose-col">
+          <p class="choose-title">Reach for DFS when</p>
+          <ul>
+            <li>memory is the scarce resource</li>
+            <li>the search space is enormous</li>
+            <li>you must explore a huge design space</li>
+            <li>any solution will do</li>
+          </ul>
+        </div>
+        <div class="choose-col">
+          <p class="choose-title">Reach for BFS when</p>
+          <ul>
+            <li>you need the shortest solution</li>
+            <li>you need the nearest exit</li>
+            <li>the goal is likely to be close by</li>
+            <li>branches may be infinite</li>
+          </ul>
+        </div>
+      </div>
+      <p>
+        These are not competing answers to one question. They are different
+        policies for choosing which state to look at next. DFS says stack. BFS
+        says queue. Uniform cost search says priority queue ordered by path cost.
+        A* says priority queue ordered by cost plus heuristic. Same skeleton,
+        different rule.
+      </p>
+
+      <h2>Where this pattern shows up</h2>
+      <ul class="apps">
+        <li><b>Backtracking puzzles</b> &mdash; Sudoku solvers and N-Queens guess,
+          check, and undo.</li>
+        <li><b>Directory trees</b> &mdash; walking a filesystem goes depth-first
+          almost by instinct.</li>
+        <li><b>Recursive parsing</b> &mdash; reading nested JSON or XML descends and
+          returns.</li>
+        <li><b>Constraint problems</b> &mdash; scheduling, timetabling and SAT solving
+          all guess, detect a conflict, and backtrack.</li>
+        <li><b>Game engines</b> &mdash; chess searches depth-first, but with pruning,
+          because exploring every branch is impossible.</li>
+        <li><b>Program synthesis</b> &mdash; write a program, test it, fail, modify,
+          try again.</li>
+      </ul>
+      <p>
+        It also describes something closer to home. A language model working
+        through a chain of reasoning usually follows one line of argument at a
+        time rather than every possible argument at once, and some inference
+        methods deliberately branch and abandon a weak line. That resembles
+        depth-first exploration, even though the machinery underneath is nothing
+        like this cave.
+      </p>
+      <p class="closing">
+        So "DFS is everywhere" is slightly too strong. What is everywhere is the
+        pattern: commit to one possibility, follow it as far as it goes, and
+        backtrack in an orderly way when it fails.
+      </p>
+
+    </article>
+  </section>
+
 </div>
+
+<footer class="site-foot">
+  <p>
+    Built for Foundations of AI, Module 1 &mdash; Searching. The cave, the rope and
+    the markers follow the state space, stack and visited set as set out in the
+    course lecture notes.
+  </p>
+</footer>
 
 <script src="js/graph.js"></script>
 <script src="js/search.js"></script>

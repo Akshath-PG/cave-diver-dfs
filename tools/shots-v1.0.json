@@ -1,0 +1,53 @@
+{
+  "shots": [
+    {
+      "name": "v1.0-a-dive",
+      "width": 1500,
+      "height": 980,
+      "steps": [
+        { "eval": "document.querySelector('.chamber[data-id=\"B\"] .chamber-hit').dispatchEvent(new MouseEvent('click',{bubbles:true}))" },
+        { "wait": 350 }
+      ]
+    },
+    {
+      "name": "v1.0-b-playground-pseudocode",
+      "width": 1500,
+      "height": 1100,
+      "steps": [
+        { "eval": "document.querySelector('.mode[data-view=\"playground\"]').click()" },
+        { "wait": 350 },
+        { "click": "#step" }, { "click": "#step" }, { "click": "#step" },
+        { "click": "#step" }, { "click": "#step" },
+        { "wait": 400 }
+      ],
+      "dump": ".pseudo li.is-active"
+    },
+    {
+      "name": "v1.0-c-learn",
+      "width": 1500,
+      "height": 1200,
+      "steps": [
+        { "eval": "document.querySelector('.mode[data-view=\"learn\"]').click()" },
+        { "wait": 400 }
+      ],
+      "dump": "#calc-note"
+    },
+    {
+      "name": "v1.0-d-learn-trace",
+      "width": 1500,
+      "height": 1100,
+      "steps": [
+        { "eval": "document.querySelector('.mode[data-view=\"learn\"]').click()" },
+        { "wait": 300 },
+        { "eval": "document.getElementById('learn-trace').scrollIntoView({block:'center'})" },
+        { "wait": 400 }
+      ]
+    },
+    {
+      "name": "v1.0-e-mobile",
+      "width": 420,
+      "height": 940,
+      "steps": [{ "wait": 400 }]
+    }
+  ]
+}
