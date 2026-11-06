@@ -1,0 +1,30 @@
+{
+  "shots": [
+    {
+      "name": "v0.5-a-race-bfs",
+      "width": 1500,
+      "height": 1050,
+      "steps": [
+        { "eval": "document.querySelector('.mode[data-view=\"race\"]').click()" },
+        { "wait": 400 },
+        { "eval": "document.getElementById('race-speed').value=12;document.getElementById('race-play').click()" },
+        { "wait": 6000 }
+      ],
+      "dump": "#race-verdict"
+    },
+    {
+      "name": "v0.5-b-race-ids",
+      "width": 1500,
+      "height": 1050,
+      "steps": [
+        { "eval": "document.querySelector('.mode[data-view=\"race\"]').click()" },
+        { "wait": 300 },
+        { "eval": "document.getElementById('race-rival').value='ids';document.getElementById('race-rival').dispatchEvent(new Event('input'))" },
+        { "wait": 300 },
+        { "eval": "document.getElementById('race-speed').value=12;document.getElementById('race-play').click()" },
+        { "wait": 9000 }
+      ],
+      "dump": "#race-verdict"
+    }
+  ]
+}

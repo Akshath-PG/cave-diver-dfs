@@ -152,7 +152,13 @@ window.CAVE = window.CAVE || {};
 
         if (!shaft) g.appendChild(el('circle', { class: 'chamber-halo', r: r * 1.8 }));
         g.appendChild(el('circle', { class: 'chamber-body', r: cr }));
-        g.appendChild(el('circle', { class: 'chamber-marker', r: Math.max(1.4, cr * 0.3) }));
+        // The marker sits as a badge on the rim, not in the middle, where
+        // it would sit on top of the chamber's label.
+        g.appendChild(el('circle', {
+          class: 'chamber-marker',
+          r: Math.max(1.6, cr * 0.26),
+          cx: cr * 0.78, cy: -cr * 0.78
+        }));
 
         if (lay.showLabels && !shaft) {
           var label = el('text', {
@@ -216,6 +222,9 @@ window.CAVE = window.CAVE || {};
 
       var seen = view.seen || null;
       var legal = view.legal || {};
+      // BFS passes a frontier: chambers discovered but not yet expanded.
+      var frontier = {};
+      (view.frontier || []).forEach(function (id) { frontier[id] = true; });
 
       // Only touch the chambers whose appearance actually changed. With an
       // endless shaft a cave can hold well over a thousand chambers, and
@@ -234,6 +243,7 @@ window.CAVE = window.CAVE || {};
         }
         if (id === state.goal && (!seen || isVisited[id])) classes.push('is-goal');
         if (isVisited[id]) classes.push('is-visited');
+        if (frontier[id]) classes.push('is-frontier');
         if (onRope[id]) classes.push('is-on-rope');
         if (id === current) classes.push('is-current');
         if (isVisited[id] && !onRope[id]) classes.push('is-finished');

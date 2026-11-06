@@ -22,6 +22,7 @@
     <nav class="modes" id="modes">
       <button class="mode is-active" data-view="dive">Dive</button>
       <button class="mode" data-view="playground">Playground</button>
+      <button class="mode" data-view="race">Race</button>
     </nav>
   </header>
 
@@ -279,12 +280,107 @@
     </div>
   </section>
 
+  <!-- ===================== RACE ===================== -->
+  <section class="view" id="view-race" hidden>
+
+    <div class="race-bar card">
+      <div class="race-controls">
+        <div class="control inline">
+          <label for="race-branching">Passages <b>b</b> <output id="race-branching-out">2</output></label>
+          <input id="race-branching" type="range" min="1" max="4" value="2">
+        </div>
+        <div class="control inline">
+          <label for="race-depth">Depth <b>m</b> <output id="race-depth-out">4</output></label>
+          <input id="race-depth" type="range" min="2" max="6" value="4">
+        </div>
+        <div class="control inline">
+          <label for="race-treasure">Treasure</label>
+          <select id="race-treasure">
+            <option value="shallow">Shallow, last branch</option>
+            <option value="deep">Deepest chamber</option>
+          </select>
+        </div>
+        <div class="control inline">
+          <label for="race-rival">Compare DFS against</label>
+          <select id="race-rival">
+            <option value="bfs">Breadth-first search</option>
+            <option value="ids">Iterative deepening</option>
+          </select>
+        </div>
+        <span class="spacer"></span>
+        <button id="race-play" class="primary">Play</button>
+        <button id="race-step">Step</button>
+        <button id="race-reset">Reset</button>
+        <label class="speed">
+          Speed
+          <input id="race-speed" type="range" min="1" max="12" value="7">
+        </label>
+      </div>
+      <p class="race-note" id="race-note"></p>
+    </div>
+
+    <div class="race-grid">
+      <section class="card">
+        <div class="card-head"><h2 id="race-left-title">DFS</h2></div>
+        <div class="cave-frame is-short" id="race-left-frame">
+          <svg id="race-left" role="img" aria-label="Depth-first search running"></svg>
+        </div>
+        <div class="readings race-readings">
+          <div class="reading">
+            <span class="r-label">Chambers entered</span>
+            <span class="r-value" id="race-left-entered">0</span>
+          </div>
+          <div class="reading">
+            <span class="r-label" id="race-left-mem-label">Rope out now</span>
+            <span class="r-value rope" id="race-left-mem">0</span>
+          </div>
+          <div class="reading">
+            <span class="r-label" id="race-left-maxmem-label">Most rope used</span>
+            <span class="r-value rope" id="race-left-maxmem">0</span>
+          </div>
+        </div>
+        <div class="status-line"><span id="race-left-status"></span></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2 id="race-right-title">BFS</h2></div>
+        <div class="cave-frame is-short" id="race-right-frame">
+          <svg id="race-right" role="img" aria-label="Rival search running"></svg>
+        </div>
+        <div class="readings race-readings">
+          <div class="reading">
+            <span class="r-label">Chambers entered</span>
+            <span class="r-value" id="race-right-entered">0</span>
+          </div>
+          <div class="reading">
+            <span class="r-label" id="race-right-mem-label">Ropes in the water</span>
+            <span class="r-value teal" id="race-right-mem">0</span>
+          </div>
+          <div class="reading">
+            <span class="r-label" id="race-right-maxmem-label">Most ropes at once</span>
+            <span class="r-value teal" id="race-right-maxmem">0</span>
+          </div>
+        </div>
+        <div class="status-line"><span id="race-right-status"></span></div>
+      </section>
+    </div>
+
+    <div class="card race-verdict">
+      <div class="card-body">
+        <p class="verdict-label">What the two numbers say</p>
+        <div class="verdict" id="race-verdict"></div>
+      </div>
+    </div>
+
+  </section>
+
 </div>
 
 <script src="js/graph.js"></script>
 <script src="js/search.js"></script>
 <script src="js/cave.js"></script>
 <script src="js/dive.js"></script>
+<script src="js/race.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

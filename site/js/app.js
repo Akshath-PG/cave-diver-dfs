@@ -523,9 +523,31 @@
   });
   dive.start();
 
+  var race = NS.race.create({
+    dom: {
+      leftSvg: $('race-left'), leftFrame: $('race-left-frame'),
+      rightSvg: $('race-right'), rightFrame: $('race-right-frame'),
+      leftTitle: $('race-left-title'), rightTitle: $('race-right-title'),
+      leftEntered: $('race-left-entered'), rightEntered: $('race-right-entered'),
+      leftMem: $('race-left-mem'), rightMem: $('race-right-mem'),
+      leftMaxMem: $('race-left-maxmem'), rightMaxMem: $('race-right-maxmem'),
+      leftMemLabel: $('race-left-mem-label'), rightMemLabel: $('race-right-mem-label'),
+      leftMaxMemLabel: $('race-left-maxmem-label'),
+      rightMaxMemLabel: $('race-right-maxmem-label'),
+      leftStatus: $('race-left-status'), rightStatus: $('race-right-status'),
+      branching: $('race-branching'), branchingOut: $('race-branching-out'),
+      depth: $('race-depth'), depthOut: $('race-depth-out'),
+      treasure: $('race-treasure'), rival: $('race-rival'),
+      play: $('race-play'), step: $('race-step'), reset: $('race-reset'),
+      speed: $('race-speed'), verdict: $('race-verdict'), caveNote: $('race-note')
+    }
+  });
+  race.start();
+
   var views = {
     dive: $('view-dive'),
-    playground: $('view-playground')
+    playground: $('view-playground'),
+    race: $('view-race')
   };
 
   document.getElementById('modes').addEventListener('click', function (e) {

@@ -158,5 +158,162 @@ window.CAVE = window.CAVE || {};
     };
   }
 
-  NS.search = { dfs: dfs, orderNeighbours: orderNeighbours };
+  /* Breadth-first search: the rival team.
+   *
+   * One diver cannot do this. BFS needs a team spreading out level by
+   * level, and every one of them is holding a rope. That is not a
+   * decoration on the metaphor, it is the memory cost: the frontier is
+   * the thing that grows like b^m, and here you can count the ropes.
+   */
+  function bfs(graph, options) {
+    var opts = options || {};
+    var start = opts.start || graph.root;
+    var goal = opts.goal || null;
+    var maxSteps = opts.maxSteps || 4000;
+
+    var steps = [];
+    var queue = [start];
+    var parent = {}; parent[start] = null;
+    var discovered = {}; discovered[start] = true;
+    var expanded = [];
+    var maxFrontier = 1;
+    var found = false;
+
+    function pathTo(id) {
+      var path = [];
+      while (id != null) { path.unshift(id); id = parent[id]; }
+      return path;
+    }
+
+    steps.push({
+      index: 0, kind: 'discover', current: start, frontier: [start],
+      visited: [], stack: [start], maxStack: 1, expansions: 0, found: false,
+      action: 'Discover ' + start + '. The queue starts with one chamber.'
+    });
+
+    while (queue.length > 0 && steps.length < maxSteps) {
+      var node = queue.shift();
+      expanded.push(node);
+      found = (goal !== null && node === goal);
+
+      var added = [];
+      if (!found) {
+        var neighbours = orderNeighbours(graph.nodes[node].neighbours, opts.order);
+        for (var i = 0; i < neighbours.length; i++) {
+          var n = neighbours[i];
+          if (!graph.nodes[n] || discovered[n]) continue;
+          discovered[n] = true;
+          parent[n] = node;
+          queue.push(n);
+          added.push(n);
+        }
+      }
+      if (queue.length > maxFrontier) maxFrontier = queue.length;
+
+      steps.push({
+        index: steps.length,
+        kind: found ? 'found' : 'expand',
+        current: node,
+        frontier: queue.slice(),
+        visited: expanded.slice(),
+        stack: pathTo(node),
+        maxStack: maxFrontier,
+        expansions: expanded.length,
+        found: found,
+        action: found
+          ? 'Dequeue ' + node + '. This is the treasure.'
+          : 'Dequeue ' + node + '. ' + (added.length
+              ? 'Add ' + added.join(', ') + ' to the back of the queue.'
+              : 'Nothing new behind it.') +
+            ' Queue now holds ' + queue.length + '.'
+      });
+
+      if (found) break;
+    }
+
+    return {
+      algorithm: 'BFS',
+      steps: steps,
+      found: found,
+      cutoff: false,
+      exhausted: steps.length >= maxSteps,
+      goal: goal,
+      stats: {
+        expansions: expanded.length,
+        maxStack: maxFrontier,   // frontier size: BFS's memory
+        visited: expanded.length,
+        steps: steps.length
+      }
+    };
+  }
+
+  /* Iterative deepening: DFS, repeated.
+   *
+   * Lecture 7 asks whether an agent can keep DFS's memory and still find
+   * the shallowest solution. This runs depth-limited DFS at limit 0, then
+   * 1, then 2, and so on, and reports the total work across all of them,
+   * which is the honest cost.
+   */
+  function ids(graph, options) {
+    var opts = options || {};
+    var maxDepth = opts.maxDepth == null ? 8 : opts.maxDepth;
+    var steps = [];
+    var totalExpansions = 0;
+    var maxStack = 0;
+    var found = false;
+    var iterations = 0;
+    var lastRun = null;
+
+    for (var limit = 0; limit <= maxDepth && !found; limit++) {
+      iterations++;
+      var pass = dfs(graph, {
+        start: opts.start, goal: opts.goal, order: opts.order,
+        limit: limit, useVisited: true, maxSteps: opts.maxSteps || 4000
+      });
+      lastRun = pass;
+
+      steps.push({
+        index: steps.length, kind: 'iteration', current: null,
+        stack: [], visited: [], frontier: [],
+        maxStack: maxStack, expansions: totalExpansions, found: false,
+        iteration: limit,
+        action: 'Start again from the entrance with the rope limited to ' +
+                limit + '.'
+      });
+
+      pass.steps.forEach(function (s) {
+        var copy = {};
+        for (var k in s) copy[k] = s[k];
+        copy.index = steps.length;
+        copy.iteration = limit;
+        copy.expansions = totalExpansions + s.expansions;
+        steps.push(copy);
+      });
+
+      totalExpansions += pass.stats.expansions;
+      if (pass.stats.maxStack > maxStack) maxStack = pass.stats.maxStack;
+      found = pass.found;
+    }
+
+    return {
+      algorithm: 'IDS',
+      steps: steps,
+      found: found,
+      cutoff: false,
+      exhausted: false,
+      goal: opts.goal || null,
+      iterations: iterations,
+      stats: {
+        expansions: totalExpansions,
+        maxStack: maxStack,
+        visited: lastRun ? lastRun.stats.visited : 0,
+        steps: steps.length
+      }
+    };
+  }
+
+  NS.search = {
+    dfs: dfs, bfs: bfs, ids: ids,
+    orderNeighbours: orderNeighbours
+  };
 })(window.CAVE);

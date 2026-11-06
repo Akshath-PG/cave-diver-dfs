@@ -583,7 +583,6 @@ button.mini {
 }
 .chamber.is-shaft.is-visited .chamber-body { fill: #11384a; stroke: #35758f; }
 .chamber.is-shaft.is-on-rope .chamber-body { stroke: var(--rope); }
-.chamber.is-shaft .chamber-marker { r: 1.4; }
 
 .chamber-hit { fill: transparent; cursor: pointer; }
 .chamber.is-clickable { cursor: pointer; }
@@ -707,6 +706,67 @@ button.primary.is-blocked:hover:not(:disabled) { background: #35454f; }
   0%, 100% { stroke-opacity: 0.55; }
   50% { stroke-opacity: 1; }
 }
+
+/* ---------- race mode ---------- */
+
+.race-bar { margin-bottom: 16px; }
+
+.race-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 14px 16px;
+}
+
+.control.inline { min-width: 150px; gap: 5px; }
+.control.inline label { font-size: 12px; }
+
+.race-note {
+  margin: 0;
+  padding: 0 16px 13px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.race-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .race-grid { grid-template-columns: 1fr; }
+}
+
+.cave-frame.is-short { height: 300px; min-height: 300px; }
+
+.race-readings {
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+}
+
+.race-readings .r-value { font-size: 17px; }
+.r-value.teal { color: var(--teal); }
+
+.race-grid .status-line { font-size: 12.5px; min-height: 46px; }
+
+.race-verdict { margin-top: 16px; }
+
+/* BFS has no single rope. The path to the chamber being expanded is
+ * still worth drawing, but faintly: the queue is the memory, not this. */
+.mode-bfs .rope { stroke: #3f7d9b; opacity: 0.55; }
+.mode-bfs .rope-glow { display: none; }
+
+.chamber.is-frontier .chamber-body {
+  fill: #0f3b3a;
+  stroke: var(--teal);
+  stroke-width: 2.5;
+}
+.chamber.is-frontier .chamber-marker { fill: var(--teal); }
 
 @media (prefers-reduced-motion: reduce) {
   .chamber.is-legal .chamber-body { animation: none; stroke-opacity: 1; }
