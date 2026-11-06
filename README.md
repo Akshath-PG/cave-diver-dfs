@@ -1,5 +1,7 @@
 # Cave Diver — Depth-First Search
 
+**Live: https://akshath-pg.github.io/cave-diver-dfs/**
+
 An interactive explanation of **depth-first search**, built for Foundations of AI
 (Module 1 — Searching).
 
