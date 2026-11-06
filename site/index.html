@@ -2,105 +2,97 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>DFS Trace</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cave Diver &mdash; Depth-First Search</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>&#129446;</text></svg>">
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<h1>Depth-First Search</h1>
-<p>State space: A &rarr; {B, C}, B &rarr; {D, E}, D &rarr; {F}, C, E, F &rarr; { }</p>
-<button id="run">Run DFS</button>
-<table id="trace" border="1" cellpadding="4">
-  <thead>
-    <tr><th>Step</th><th>Current State</th><th>Action Performed</th><th>Stack (Current Path)</th><th>Visited Set</th></tr>
-  </thead>
-  <tbody></tbody>
-</table>
+<div class="wrap">
 
-<script>
-// The state space from the lecture notes (Lecture 3).
-var GRAPH = {
-  A: ["B", "C"],
-  B: ["D", "E"],
-  C: [],
-  D: ["F"],
-  E: [],
-  F: []
-};
+  <header class="masthead">
+    <div>
+      <h1>Cave <span>Diver</span></h1>
+      <p class="tagline">
+        A diver enters a flooded cave with one rope. He swims down one passage until it
+        ends, follows the rope back, and tries the next one. That is depth-first search.
+        The rope you see is the stack.
+      </p>
+    </div>
+  </header>
 
-// The algorithm, exactly as written in the notes:
-//   Visit current state. Mark it visited. Push it onto the stack.
-//   If an unvisited neighbouring state exists, go there. Otherwise pop. Return. Repeat.
-function runDFS(graph, start) {
-  var steps = [];
-  var stack = [];
-  var visited = [];
+  <div class="stage">
 
-  stack.push(start);
-  visited.push(start);
-  steps.push({
-    current: start,
-    action: "Visit " + start + ", Push " + start,
-    stack: stack.slice(),
-    visited: visited.slice()
-  });
+    <section class="card">
+      <div class="card-head">
+        <h2>The Cave</h2>
+        <span class="chip" id="cave-name">Lecture 3 state space</span>
+      </div>
 
-  while (stack.length > 0) {
-    var current = stack[stack.length - 1];
-    var neighbours = graph[current] || [];
-    var next = null;
+      <div class="cave-frame">
+        <svg id="cave" role="img" aria-label="Cave map showing the diver and the rope"></svg>
+      </div>
 
-    for (var i = 0; i < neighbours.length; i++) {
-      if (visited.indexOf(neighbours[i]) === -1) {
-        next = neighbours[i];
-        break;
-      }
-    }
+      <div class="status-line" id="status">
+        <span class="tag">ready</span>
+        <span id="status-text">Press Play to send the diver in.</span>
+      </div>
 
-    if (next !== null) {
-      visited.push(next);
-      stack.push(next);
-      steps.push({
-        current: next,
-        action: "From " + current + ", choose " + next + ". Visit " + next + ", Push " + next,
-        stack: stack.slice(),
-        visited: visited.slice()
-      });
-    } else {
-      stack.pop();
-      var returnedTo = stack.length > 0 ? stack[stack.length - 1] : null;
-      steps.push({
-        current: returnedTo === null ? "—" : returnedTo,
-        action: returnedTo === null
-          ? current + " has no unexplored actions. Pop " + current + ". Search terminates."
-          : current + " has no unexplored actions. Pop " + current + " and return to " + returnedTo,
-        stack: stack.slice(),
-        visited: visited.slice()
-      });
-    }
-  }
+      <div class="controls">
+        <button id="play" class="primary">Play</button>
+        <button id="back">Back</button>
+        <button id="step">Step</button>
+        <button id="reset">Reset</button>
+        <span class="spacer"></span>
+        <label class="speed">
+          Speed
+          <input id="speed" type="range" min="1" max="10" value="5">
+        </label>
+      </div>
+    </section>
 
-  return steps;
-}
+    <aside class="panel-stack">
 
-function render() {
-  var steps = runDFS(GRAPH, "A");
-  var body = document.querySelector("#trace tbody");
-  body.innerHTML = "";
+      <section class="card">
+        <div class="card-head">
+          <h2>The Rope &mdash; Stack</h2>
+          <span class="chip" id="stack-depth">0</span>
+        </div>
+        <div class="card-body">
+          <div class="stack-view" id="stack-view"></div>
+          <p class="note">
+            The rope holds only the current path. Finished branches are wound back in,
+            which is why DFS needs just O(m) memory.
+          </p>
+        </div>
+      </section>
 
-  for (var i = 0; i < steps.length; i++) {
-    var s = steps[i];
-    var row = document.createElement("tr");
-    var sortedVisited = s.visited.slice().sort();
-    row.innerHTML =
-      "<td>" + i + "</td>" +
-      "<td>" + s.current + "</td>" +
-      "<td>" + s.action + "</td>" +
-      "<td>[" + s.stack.join(", ") + "]</td>" +
-      "<td>{" + sortedVisited.join(", ") + "}</td>";
-    body.appendChild(row);
-  }
-}
+      <section class="card">
+        <div class="card-head">
+          <h2>Markers &mdash; Visited Set</h2>
+          <span class="chip teal" id="visited-count">0</span>
+        </div>
+        <div class="card-body">
+          <div class="chips" id="visited-view"></div>
+        </div>
+      </section>
 
-document.getElementById("run").addEventListener("click", render);
-</script>
+      <section class="card">
+        <div class="card-head">
+          <h2>Dive Log</h2>
+        </div>
+        <div class="card-body">
+          <div class="log" id="log"></div>
+        </div>
+      </section>
+
+    </aside>
+  </div>
+</div>
+
+<script src="js/graph.js"></script>
+<script src="js/search.js"></script>
+<script src="js/cave.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,406 @@
+/* Cave Diver - visual language
+ *
+ * Dark water, warm rope. The palette is deliberately two-sided: everything
+ * cold and blue is the cave (the problem), everything warm and amber is the
+ * diver's own memory (the stack). A student should be able to tell the data
+ * structure from the state space at a glance, by colour alone.
+ */
+
+:root {
+  --abyss: #050d13;
+  --deep: #0a1a24;
+  --mid: #102a38;
+  --panel: #0e212d;
+  --rock: #16303e;
+  --line: #1d4154;
+
+  --teal: #4fd1c5;
+  --rope: #f0943c;
+  --rope-bright: #ffb067;
+  --gold: #ffd166;
+  --ink: #e9f3f7;
+  --muted: #8aa6b4;
+  --danger: #ff7b72;
+
+  --radius: 12px;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  --sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--abyss);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background:
+    radial-gradient(1100px 620px at 50% -12%, #123143 0%, transparent 62%),
+    linear-gradient(180deg, #071219 0%, #050d13 100%);
+  min-height: 100vh;
+}
+
+.wrap {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 26px 22px 60px;
+}
+
+/* ---------- header ---------- */
+
+.masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 22px;
+}
+
+.masthead h1 {
+  margin: 0;
+  font-size: 27px;
+  letter-spacing: -0.015em;
+  font-weight: 650;
+}
+
+.masthead h1 span { color: var(--rope); }
+
+.tagline {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 62ch;
+  line-height: 1.5;
+}
+
+/* ---------- layout ---------- */
+
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1040px) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+}
+
+.card {
+  background: linear-gradient(180deg, rgba(18,44,58,0.72), rgba(10,26,36,0.72));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 15px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(6,18,26,0.5);
+}
+
+.card-head h2 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.card-body { padding: 14px 15px; }
+
+/* ---------- the cave ---------- */
+
+.cave-frame {
+  position: relative;
+  background:
+    radial-gradient(700px 420px at 50% 0%, rgba(26,78,104,0.42), transparent 70%),
+    linear-gradient(180deg, #0b2230 0%, #061119 100%);
+  min-height: 420px;
+}
+
+#cave {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 62vh;
+}
+
+.layer-passages .passage-wall {
+  stroke: #0a1c26;
+  stroke-width: 15;
+  stroke-linecap: round;
+}
+
+.layer-passages .passage {
+  stroke: #24536b;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke 240ms ease, stroke-width 240ms ease;
+}
+
+.layer-passages .passage.is-lit {
+  stroke: #3f88a8;
+  stroke-width: 7;
+}
+
+.crawlway {
+  fill: none;
+  stroke: #1f4659;
+  stroke-width: 3;
+  stroke-dasharray: 5 7;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+.rope {
+  fill: none;
+  stroke: var(--rope);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: all 200ms ease;
+}
+
+.rope-glow {
+  fill: none;
+  stroke: var(--rope);
+  stroke-width: 13;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.16;
+  filter: blur(2px);
+  transition: all 200ms ease;
+}
+
+/* chambers */
+
+.chamber-halo {
+  fill: transparent;
+  transition: fill 260ms ease;
+}
+
+.chamber-body {
+  fill: #0d2634;
+  stroke: #2b5e78;
+  stroke-width: 2.5;
+  transition: fill 260ms ease, stroke 260ms ease;
+}
+
+.chamber-marker {
+  fill: transparent;
+  transition: fill 260ms ease;
+}
+
+.chamber-label {
+  fill: #7fa0b1;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  text-anchor: middle;
+  pointer-events: none;
+  transition: fill 260ms ease;
+}
+
+.chamber.is-visited .chamber-body { fill: #11384a; stroke: #3d8aa5; }
+.chamber.is-visited .chamber-label { fill: #bcd6e2; }
+.chamber.is-visited .chamber-marker { fill: var(--teal); }
+
+.chamber.is-on-rope .chamber-body { stroke: var(--rope); fill: #1b3443; }
+.chamber.is-on-rope .chamber-label { fill: #ffe6c7; }
+
+.chamber.is-current .chamber-body {
+  fill: #2d4a3f;
+  stroke: var(--gold);
+  stroke-width: 3.5;
+}
+.chamber.is-current .chamber-halo { fill: rgba(255,209,102,0.1); }
+.chamber.is-current .chamber-label { fill: #fff5dd; }
+
+.chamber.is-finished .chamber-body { opacity: 0.92; }
+
+.treasure {
+  fill: var(--gold);
+  opacity: 0.95;
+  filter: url(#softGlow);
+}
+
+.diver-body { fill: #ffe0b0; stroke: #c9762a; stroke-width: 2; }
+.diver-eye { fill: #3a2410; }
+.diver, .lamp { transition: transform 220ms ease, opacity 220ms ease; }
+
+/* ---------- controls ---------- */
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  padding: 12px 15px;
+  border-top: 1px solid var(--line);
+  background: rgba(6,18,26,0.55);
+}
+
+button {
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 550;
+  color: var(--ink);
+  background: #173c4f;
+  border: 1px solid #2a637e;
+  border-radius: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, transform 80ms ease;
+}
+
+button:hover:not(:disabled) { background: #1d4c63; border-color: #3a7d9c; }
+button:active:not(:disabled) { transform: translateY(1px); }
+
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+button.primary {
+  background: var(--rope);
+  border-color: #ffb067;
+  color: #2a1706;
+  font-weight: 650;
+}
+button.primary:hover:not(:disabled) { background: var(--rope-bright); }
+
+.spacer { flex: 1 1 auto; }
+
+.speed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.speed input { width: 110px; accent-color: var(--rope); }
+
+/* ---------- side panels ---------- */
+
+.panel-stack { display: grid; gap: 16px; }
+
+.stack-view {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 5px;
+  min-height: 136px;
+  justify-content: flex-end;
+}
+
+.stack-item {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  padding: 7px 11px;
+  border-radius: 7px;
+  background: #1d3a49;
+  border: 1px solid #2f6880;
+  border-left: 4px solid var(--rope);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stack-item.top {
+  background: #33432f;
+  border-color: var(--gold);
+  border-left-color: var(--gold);
+}
+
+.stack-item .depth { color: var(--muted); font-size: 11.5px; }
+
+.stack-empty {
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+  padding: 10px 2px;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.chip {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #11313f;
+  border: 1px solid #2c6174;
+  color: #b9d6e2;
+}
+
+.chip.teal { border-color: var(--teal); color: #cdf5f0; }
+
+/* ---------- log ---------- */
+
+.log {
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  display: grid;
+  gap: 6px;
+}
+
+.log-row {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  color: #c3dae4;
+}
+
+.log-row .n { color: var(--muted); font-family: var(--mono); font-size: 12px; }
+.log-row.is-current { background: rgba(240,148,60,0.14); color: #ffe3c4; }
+.log-row.kind-pop { color: #9fc0cf; }
+
+/* ---------- misc ---------- */
+
+.note {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 10px 0 0;
+}
+
+.status-line {
+  font-size: 13.5px;
+  color: #cfe4ec;
+  padding: 10px 15px;
+  border-top: 1px solid var(--line);
+  background: rgba(6,18,26,0.35);
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-line .tag {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: #1d4154;
+  color: #9fc5d4;
+}
+
+.status-line .tag.visit { background: #1f4a3a; color: #8fe0b4; }
+.status-line .tag.pop { background: #4a2f1f; color: #ffbe8f; }

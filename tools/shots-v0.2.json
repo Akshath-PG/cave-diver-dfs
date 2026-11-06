@@ -1,0 +1,29 @@
+{
+  "shots": [
+    {
+      "name": "v0.2-a-start",
+      "width": 1400,
+      "height": 900
+    },
+    {
+      "name": "v0.2-b-deepest",
+      "width": 1400,
+      "height": 900,
+      "steps": [
+        { "click": "#step" }, { "click": "#step" },
+        { "click": "#step" }, { "wait": 500 }
+      ]
+    },
+    {
+      "name": "v0.2-c-backtracked",
+      "width": 1400,
+      "height": 900,
+      "steps": [
+        { "click": "#step" }, { "click": "#step" }, { "click": "#step" },
+        { "click": "#step" }, { "click": "#step" }, { "click": "#step" },
+        { "wait": 500 }
+      ],
+      "dump": "#status"
+    }
+  ]
+}
