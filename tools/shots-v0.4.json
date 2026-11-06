@@ -1,0 +1,44 @@
+{
+  "shots": [
+    {
+      "name": "v0.4-a-dive-start",
+      "width": 1500,
+      "height": 980,
+      "dump": "#dive-message"
+    },
+    {
+      "name": "v0.4-b-dive-moved",
+      "width": 1500,
+      "height": 980,
+      "steps": [
+        { "eval": "document.querySelector('.chamber[data-id=\"B\"] .chamber-hit').dispatchEvent(new MouseEvent('click',{bubbles:true}))" },
+        { "wait": 300 },
+        { "eval": "document.querySelector('.chamber[data-id=\"D\"] .chamber-hit').dispatchEvent(new MouseEvent('click',{bubbles:true}))" },
+        { "wait": 400 }
+      ],
+      "dump": "#dive-message"
+    },
+    {
+      "name": "v0.4-c-refused",
+      "width": 1500,
+      "height": 980,
+      "steps": [
+        { "eval": "document.querySelector('.chamber[data-id=\"B\"] .chamber-hit').dispatchEvent(new MouseEvent('click',{bubbles:true}))" },
+        { "wait": 250 },
+        { "click": "#dive-pop" },
+        { "wait": 400 }
+      ],
+      "dump": "#dive-message"
+    },
+    {
+      "name": "v0.4-d-won",
+      "width": 1500,
+      "height": 980,
+      "steps": [
+        { "eval": "['B','D','F'].forEach(function(id){document.querySelector('.chamber[data-id=\"'+id+'\"] .chamber-hit').dispatchEvent(new MouseEvent('click',{bubbles:true}));})" },
+        { "wait": 500 }
+      ],
+      "dump": "#dive-message"
+    }
+  ]
+}

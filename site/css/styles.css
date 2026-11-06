@@ -588,3 +588,127 @@ button.mini {
 .chamber-hit { fill: transparent; cursor: pointer; }
 .chamber.is-clickable { cursor: pointer; }
 .chamber.is-clickable:hover .chamber-body { stroke: var(--gold); }
+
+/* ---------- dive mode ---------- */
+
+.modes { display: flex; gap: 6px; }
+
+.mode {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  padding: 7px 17px;
+  font-size: 13.5px;
+}
+
+.mode.is-active {
+  background: #173c4f;
+  border-color: var(--rope);
+  color: var(--ink);
+}
+
+.view[hidden] { display: none; }
+
+.level-name {
+  margin: 0 0 5px;
+  font-size: 15.5px;
+  font-weight: 650;
+  color: var(--gold);
+}
+
+.level-list { display: grid; gap: 5px; }
+.level-list .mini { text-align: left; }
+.level-list .mini.is-active {
+  background: #17422f;
+  border-color: var(--teal);
+  color: #d6f7f1;
+}
+
+.rules {
+  background: rgba(9,26,36,0.55);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 10px 12px;
+}
+
+.rules-title {
+  margin: 0 0 6px;
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--rope);
+}
+
+.rules p { margin: 0 0 5px; font-size: 12.5px; line-height: 1.5; color: #c3dae4; }
+.rules p:last-child { margin-bottom: 0; }
+
+.dive-message {
+  padding: 12px 15px;
+  border-top: 1px solid var(--line);
+  font-size: 13.5px;
+  line-height: 1.55;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  background: rgba(6,18,26,0.4);
+}
+
+.dive-message.is-info { color: #bdd6e2; }
+.dive-message.is-good { color: #a6e3c4; }
+.dive-message.is-warn { color: #ffd9a8; }
+.dive-message.is-bad { color: #ffb3ad; background: rgba(90,28,28,0.22); }
+.dive-message.is-win {
+  color: #ffe6a8;
+  background: rgba(90,70,20,0.24);
+  font-weight: 550;
+}
+
+/* Still clickable: the refusal is the lesson. */
+button.primary.is-blocked {
+  background: #2c3a44;
+  border-color: #3d525f;
+  color: #93a9b5;
+}
+button.primary.is-blocked:hover:not(:disabled) { background: #35454f; }
+
+.howto { margin: 0; padding-left: 17px; display: grid; gap: 7px; }
+.howto li { font-size: 12.5px; line-height: 1.5; color: #c3dae4; }
+.howto b { color: var(--ink); font-weight: 600; }
+
+.card.is-lesson { border-color: var(--gold); }
+.lesson-text { margin: 0; font-size: 13px; line-height: 1.6; color: #f0e2c4; }
+
+/* fog of war */
+
+.chamber.is-hidden { opacity: 0; pointer-events: none; }
+.passage.is-hidden, .passage-wall.is-hidden { opacity: 0; }
+
+.chamber.is-glimpsed .chamber-body {
+  fill: #081a24;
+  stroke: #244b5f;
+  stroke-dasharray: 3 3;
+}
+.chamber.is-glimpsed .chamber-label { opacity: 0; }
+
+/* You cannot see treasure through rock. Without this the dive stops
+ * being an uninformed search the moment the goal comes into range. */
+.chamber.is-glimpsed .treasure { opacity: 0; }
+
+/* A chamber you are allowed to swim into. */
+.chamber.is-legal .chamber-body {
+  fill: #123a4a;
+  stroke: var(--gold);
+  stroke-dasharray: none;
+  animation: beckon 1.9s ease-in-out infinite;
+}
+.chamber.is-legal .chamber-halo { fill: rgba(255,209,102,0.09); }
+
+@keyframes beckon {
+  0%, 100% { stroke-opacity: 0.55; }
+  50% { stroke-opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chamber.is-legal .chamber-body { animation: none; stroke-opacity: 1; }
+  .cave-frame { scroll-behavior: auto; }
+}

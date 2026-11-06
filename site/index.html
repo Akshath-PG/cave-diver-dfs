@@ -16,182 +16,275 @@
       <p class="tagline">
         A diver enters a flooded cave with one rope. He swims down one passage until it
         ends, follows the rope back, and tries the next one. That is depth-first search.
-        The rope you see is the stack. Change the cave on the left and watch what the
-        algorithm does about it.
+        The rope you see is the stack.
       </p>
     </div>
+    <nav class="modes" id="modes">
+      <button class="mode is-active" data-view="dive">Dive</button>
+      <button class="mode" data-view="playground">Playground</button>
+    </nav>
   </header>
 
-  <div class="stage">
+  <!-- ===================== DIVE ===================== -->
+  <section class="view" id="view-dive">
+    <div class="stage">
 
-    <!-- ---------------- conditions ---------------- -->
-    <aside class="card controls-card">
-      <div class="card-head">
-        <h2>Conditions</h2>
-        <button id="new-cave" class="mini">New cave</button>
-      </div>
-      <div class="card-body control-list">
+      <aside class="card">
+        <div class="card-head"><h2>Objective</h2></div>
+        <div class="card-body control-list">
+          <div>
+            <p class="level-name" id="level-name">First Dive</p>
+            <p class="hint" id="level-brief"></p>
+          </div>
 
-        <div class="preset-row">
-          <button id="preset-notes" class="mini">Notes cave A&ndash;F</button>
-          <button id="preset-random" class="mini">Random cave</button>
-        </div>
+          <div class="level-list" id="levels"></div>
 
-        <div class="control">
-          <label for="branching">Passages per chamber <b>b</b> <output id="branching-out">2</output></label>
-          <input id="branching" type="range" min="1" max="5" value="2">
-        </div>
-
-        <div class="control">
-          <label for="depth">Cave depth <b>m</b> <output id="depth-out">4</output></label>
-          <input id="depth" type="range" min="1" max="8" value="4">
-        </div>
-
-        <div class="control">
-          <label for="loops">Crawl-ways (loops) <output id="loops-out">0</output></label>
-          <input id="loops" type="range" min="0" max="10" value="0">
-        </div>
-
-        <div class="control">
-          <label for="order">Which passage first?</label>
-          <select id="order">
-            <option value="left">Left first</option>
-            <option value="right">Right first</option>
-            <option value="random">Random</option>
-          </select>
-        </div>
-
-        <div class="control">
-          <label for="treasure">Treasure</label>
-          <select id="treasure">
-            <option value="none">No treasure (full sweep)</option>
-            <option value="shallow-far">Shallow, last branch</option>
-            <option value="shallow-near">Shallow, first branch</option>
-            <option value="deep">Deepest chamber</option>
-          </select>
-          <p class="hint">Or click any chamber in the cave to move it there.</p>
-        </div>
-
-        <div class="control">
-          <label for="rope-limit">Rope limit <output id="rope-limit-out">none</output></label>
-          <input id="rope-limit" type="range" min="0" max="8" value="0">
-          <p class="hint">0 means an unlimited rope.</p>
-        </div>
-
-        <label class="toggle">
-          <input id="markers" type="checkbox" checked>
-          <span>Leave markers (visited set)</span>
-        </label>
-
-        <label class="toggle">
-          <input id="endless" type="checkbox">
-          <span>Add an endless passage</span>
-        </label>
-
-      </div>
-    </aside>
-
-    <!-- ---------------- the cave ---------------- -->
-    <section class="card">
-      <div class="card-head">
-        <h2>The Cave</h2>
-        <span class="chip" id="cave-name">Lecture 3 state space</span>
-      </div>
-
-      <div class="cave-frame" id="cave-frame">
-        <svg id="cave" role="img" aria-label="Cave map showing the diver and the rope"></svg>
-        <div class="too-big" id="too-big" hidden>
-          <p class="too-big-number" id="too-big-number">0</p>
-          <p class="too-big-label">chambers in this cave</p>
-          <p class="too-big-text" id="too-big-text"></p>
-        </div>
-      </div>
-
-      <div class="status-line" id="status">
-        <span class="tag">ready</span>
-        <span id="status-text">Press Play to send the diver in.</span>
-      </div>
-
-      <div class="controls">
-        <button id="play" class="primary">Play</button>
-        <button id="back">Back</button>
-        <button id="step">Step</button>
-        <button id="reset">Reset</button>
-        <span class="spacer"></span>
-        <label class="speed">
-          Speed
-          <input id="speed" type="range" min="1" max="12" value="6">
-        </label>
-      </div>
-    </section>
-
-    <!-- ---------------- readings ---------------- -->
-    <aside class="panel-stack">
-
-      <section class="card">
-        <div class="card-head"><h2>Readings</h2></div>
-        <div class="card-body">
           <div class="readings">
             <div class="reading">
-              <span class="r-label">Chambers in cave</span>
-              <span class="r-value" id="r-total">6</span>
-            </div>
-            <div class="reading">
               <span class="r-label">Chambers entered</span>
-              <span class="r-value" id="r-entered">0</span>
+              <span class="r-value" id="d-entered">1</span>
             </div>
             <div class="reading">
               <span class="r-label">Rope out now</span>
-              <span class="r-value rope" id="r-rope">0</span>
+              <span class="r-value rope" id="d-rope">1</span>
             </div>
             <div class="reading">
               <span class="r-label">Most rope used</span>
-              <span class="r-value rope" id="r-maxrope">0</span>
+              <span class="r-value rope" id="d-maxrope">1</span>
+            </div>
+            <div class="reading">
+              <span class="r-label">Moves refused</span>
+              <span class="r-value" id="d-wrong">0</span>
             </div>
           </div>
-          <p class="verdict-label">Outcome of the whole dive</p>
-          <div class="verdict" id="verdict">Ready to dive.</div>
+
+          <div class="rules">
+            <p class="rules-title">The one rule</p>
+            <p>If this chamber has a passage you have not searched, take it.</p>
+            <p>Only when it has none may you wind the rope in.</p>
+          </div>
         </div>
-      </section>
+      </aside>
 
       <section class="card">
         <div class="card-head">
-          <h2>The Rope &mdash; Stack</h2>
-          <span class="chip" id="stack-depth">0</span>
+          <h2>The Cave</h2>
+          <span class="chip">Dark &mdash; you see one chamber ahead</span>
         </div>
-        <div class="card-body">
-          <div class="stack-view" id="stack-view"></div>
-          <p class="note">
-            The rope holds only the current path. Finished branches are wound back in,
-            which is why DFS needs just O(m) memory.
-          </p>
+        <div class="cave-frame" id="dive-frame">
+          <svg id="dive-cave" role="img" aria-label="Dark cave; click a passage to swim"></svg>
+        </div>
+        <div class="dive-message is-info" id="dive-message"></div>
+        <div class="controls">
+          <button id="dive-pop" class="primary">Wind in the rope</button>
+          <button id="dive-restart">Restart</button>
+          <button id="dive-next">Next cave</button>
         </div>
       </section>
+
+      <aside class="panel-stack">
+        <section class="card">
+          <div class="card-head"><h2>Your Rope &mdash; Stack</h2></div>
+          <div class="card-body">
+            <div class="stack-view" id="dive-stack"></div>
+          </div>
+        </section>
+
+        <section class="card is-lesson" id="dive-lesson" hidden>
+          <div class="card-head"><h2>What just happened</h2></div>
+          <div class="card-body">
+            <p class="lesson-text" id="dive-lesson-text"></p>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h2>How to dive</h2></div>
+          <div class="card-body">
+            <ul class="howto">
+              <li>Click a <b>glowing chamber</b> to swim into it.</li>
+              <li>Chambers you have entered keep a <b>teal marker</b>.</li>
+              <li>The <b>amber rope</b> behind you is the stack.</li>
+              <li>At a dead end, wind the rope in to go back.</li>
+            </ul>
+          </div>
+        </section>
+      </aside>
+
+    </div>
+  </section>
+
+  <!-- ===================== PLAYGROUND ===================== -->
+  <section class="view" id="view-playground" hidden>
+    <div class="stage">
+
+      <aside class="card controls-card">
+        <div class="card-head">
+          <h2>Conditions</h2>
+          <button id="new-cave" class="mini">New cave</button>
+        </div>
+        <div class="card-body control-list">
+
+          <div class="preset-row">
+            <button id="preset-notes" class="mini">Notes cave A&ndash;F</button>
+            <button id="preset-random" class="mini">Random cave</button>
+          </div>
+
+          <div class="control">
+            <label for="branching">Passages per chamber <b>b</b> <output id="branching-out">2</output></label>
+            <input id="branching" type="range" min="1" max="5" value="2">
+          </div>
+
+          <div class="control">
+            <label for="depth">Cave depth <b>m</b> <output id="depth-out">4</output></label>
+            <input id="depth" type="range" min="1" max="8" value="4">
+          </div>
+
+          <div class="control">
+            <label for="loops">Crawl-ways (loops) <output id="loops-out">0</output></label>
+            <input id="loops" type="range" min="0" max="10" value="0">
+          </div>
+
+          <div class="control">
+            <label for="order">Which passage first?</label>
+            <select id="order">
+              <option value="left">Left first</option>
+              <option value="right">Right first</option>
+              <option value="random">Random</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <label for="treasure">Treasure</label>
+            <select id="treasure">
+              <option value="none">No treasure (full sweep)</option>
+              <option value="shallow-far">Shallow, last branch</option>
+              <option value="shallow-near">Shallow, first branch</option>
+              <option value="deep">Deepest chamber</option>
+            </select>
+            <p class="hint">Or click any chamber in the cave to move it there.</p>
+          </div>
+
+          <div class="control">
+            <label for="rope-limit">Rope limit <output id="rope-limit-out">none</output></label>
+            <input id="rope-limit" type="range" min="0" max="8" value="0">
+            <p class="hint">0 means an unlimited rope.</p>
+          </div>
+
+          <label class="toggle">
+            <input id="markers" type="checkbox" checked>
+            <span>Leave markers (visited set)</span>
+          </label>
+
+          <label class="toggle">
+            <input id="endless" type="checkbox">
+            <span>Add an endless passage</span>
+          </label>
+
+        </div>
+      </aside>
 
       <section class="card">
         <div class="card-head">
-          <h2>Markers &mdash; Visited Set</h2>
-          <span class="chip teal" id="visited-count">0</span>
+          <h2>The Cave</h2>
+          <span class="chip" id="cave-name">Lecture 3 state space</span>
         </div>
-        <div class="card-body">
-          <div class="chips" id="visited-view"></div>
+
+        <div class="cave-frame" id="cave-frame">
+          <svg id="cave" role="img" aria-label="Cave map showing the diver and the rope"></svg>
+          <div class="too-big" id="too-big" hidden>
+            <p class="too-big-number" id="too-big-number">0</p>
+            <p class="too-big-label">chambers in this cave</p>
+            <p class="too-big-text" id="too-big-text"></p>
+          </div>
+        </div>
+
+        <div class="status-line" id="status">
+          <span class="tag">ready</span>
+          <span id="status-text">Press Play to send the diver in.</span>
+        </div>
+
+        <div class="controls">
+          <button id="play" class="primary">Play</button>
+          <button id="back">Back</button>
+          <button id="step">Step</button>
+          <button id="reset">Reset</button>
+          <span class="spacer"></span>
+          <label class="speed">
+            Speed
+            <input id="speed" type="range" min="1" max="12" value="6">
+          </label>
         </div>
       </section>
 
-      <section class="card">
-        <div class="card-head"><h2>Dive Log</h2></div>
-        <div class="card-body">
-          <div class="log" id="log"></div>
-        </div>
-      </section>
+      <aside class="panel-stack">
 
-    </aside>
-  </div>
+        <section class="card">
+          <div class="card-head"><h2>Readings</h2></div>
+          <div class="card-body">
+            <div class="readings">
+              <div class="reading">
+                <span class="r-label">Chambers in cave</span>
+                <span class="r-value" id="r-total">6</span>
+              </div>
+              <div class="reading">
+                <span class="r-label">Chambers entered</span>
+                <span class="r-value" id="r-entered">0</span>
+              </div>
+              <div class="reading">
+                <span class="r-label">Rope out now</span>
+                <span class="r-value rope" id="r-rope">0</span>
+              </div>
+              <div class="reading">
+                <span class="r-label">Most rope used</span>
+                <span class="r-value rope" id="r-maxrope">0</span>
+              </div>
+            </div>
+            <p class="verdict-label">Outcome of the whole dive</p>
+            <div class="verdict" id="verdict">Ready to dive.</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>The Rope &mdash; Stack</h2>
+            <span class="chip" id="stack-depth">0</span>
+          </div>
+          <div class="card-body">
+            <div class="stack-view" id="stack-view"></div>
+            <p class="note">
+              The rope holds only the current path. Finished branches are wound back in,
+              which is why DFS needs just O(m) memory.
+            </p>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>Markers &mdash; Visited Set</h2>
+            <span class="chip teal" id="visited-count">0</span>
+          </div>
+          <div class="card-body">
+            <div class="chips" id="visited-view"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h2>Dive Log</h2></div>
+          <div class="card-body">
+            <div class="log" id="log"></div>
+          </div>
+        </section>
+
+      </aside>
+    </div>
+  </section>
+
 </div>
 
 <script src="js/graph.js"></script>
 <script src="js/search.js"></script>
 <script src="js/cave.js"></script>
+<script src="js/dive.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

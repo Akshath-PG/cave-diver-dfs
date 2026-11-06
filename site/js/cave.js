@@ -28,6 +28,8 @@ window.CAVE = window.CAVE || {};
       goal: null,
       chambers: {},
       edges: {},
+      edgeEnds: {},
+      walls: {},
       prevClass: {},
       prevLit: {},
       scale: 1,
@@ -38,6 +40,8 @@ window.CAVE = window.CAVE || {};
       while (svg.firstChild) svg.removeChild(svg.firstChild);
       state.chambers = {};
       state.edges = {};
+      state.edgeEnds = {};
+      state.walls = {};
       state.prevClass = {};
       state.prevLit = {};
     }
@@ -102,16 +106,19 @@ window.CAVE = window.CAVE || {};
         var a = P[edge[0]], b = P[edge[1]];
         if (!a || !b) return;
         var key = edge[0] + '>' + edge[1];
-        groups.passages.appendChild(el('line', {
+        var wall = el('line', {
           class: 'passage-wall', x1: a.x, y1: a.y, x2: b.x, y2: b.y,
           'stroke-width': Math.max(6, r * 0.9)
-        }));
+        });
+        groups.passages.appendChild(wall);
+        state.walls[key] = wall;
         var inner = el('line', {
           class: 'passage', x1: a.x, y1: a.y, x2: b.x, y2: b.y,
           'data-edge': key, 'stroke-width': Math.max(2.5, r * 0.36)
         });
         groups.passages.appendChild(inner);
         state.edges[key] = inner;
+        state.edgeEnds[key] = edge;
       });
 
       lay.crossEdges.forEach(function (edge) {
@@ -207,6 +214,9 @@ window.CAVE = window.CAVE || {};
       stack.forEach(function (id) { onRope[id] = true; });
       visited.forEach(function (id) { isVisited[id] = true; });
 
+      var seen = view.seen || null;
+      var legal = view.legal || {};
+
       // Only touch the chambers whose appearance actually changed. With an
       // endless shaft a cave can hold well over a thousand chambers, and
       // rewriting every class on every step made playback stutter.
@@ -215,7 +225,14 @@ window.CAVE = window.CAVE || {};
         var classes = ['chamber'];
         if (shaft) classes.push('is-shaft');
         if (state.onChamberClick && !shaft) classes.push('is-clickable');
-        if (id === state.goal) classes.push('is-goal');
+        // Dive mode passes `seen` and `legal`; without them everything is
+        // visible, which is what the playground wants.
+        if (seen) {
+          if (!seen[id]) classes.push('is-hidden');
+          else if (!isVisited[id]) classes.push('is-glimpsed');
+          if (legal[id]) classes.push('is-legal');
+        }
+        if (id === state.goal && (!seen || isVisited[id])) classes.push('is-goal');
         if (isVisited[id]) classes.push('is-visited');
         if (onRope[id]) classes.push('is-on-rope');
         if (id === current) classes.push('is-current');
@@ -233,9 +250,13 @@ window.CAVE = window.CAVE || {};
         lit[stack[i + 1] + '>' + stack[i]] = true;
       }
       Object.keys(state.edges).forEach(function (key) {
-        var want = !!lit[key];
+        var ends = state.edgeEnds[key];
+        var hidden = seen ? !(seen[ends[0]] && seen[ends[1]]) : false;
+        var want = (lit[key] ? 'lit' : '') + (hidden ? ' hidden' : '');
         if (state.prevLit[key] !== want) {
-          state.edges[key].classList.toggle('is-lit', want);
+          state.edges[key].classList.toggle('is-lit', !!lit[key]);
+          state.edges[key].classList.toggle('is-hidden', hidden);
+          state.walls[key].classList.toggle('is-hidden', hidden);
           state.prevLit[key] = want;
         }
       });

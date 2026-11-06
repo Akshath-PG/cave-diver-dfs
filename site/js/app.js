@@ -506,4 +506,47 @@
   readUrl();
   syncOutputs();
   build();
+
+  /* ---------- modes ---------- */
+
+  var dive = NS.dive.create({
+    dom: {
+      svg: $('dive-cave'), frame: $('dive-frame'),
+      levelName: $('level-name'), levelBrief: $('level-brief'),
+      levels: $('levels'), message: $('dive-message'),
+      entered: $('d-entered'), rope: $('d-rope'),
+      maxRope: $('d-maxrope'), wrong: $('d-wrong'),
+      stackView: $('dive-stack'),
+      lesson: $('dive-lesson'), lessonText: $('dive-lesson-text'),
+      popBtn: $('dive-pop'), restart: $('dive-restart'), next: $('dive-next')
+    }
+  });
+  dive.start();
+
+  var views = {
+    dive: $('view-dive'),
+    playground: $('view-playground')
+  };
+
+  document.getElementById('modes').addEventListener('click', function (e) {
+    var btn = e.target.closest('.mode');
+    if (!btn) return;
+    pause();
+    var wanted = btn.dataset.view;
+    Object.keys(views).forEach(function (name) {
+      views[name].hidden = name !== wanted;
+    });
+    Array.prototype.forEach.call(this.querySelectorAll('.mode'), function (b) {
+      b.classList.toggle('is-active', b === btn);
+    });
+    // A hidden frame has no width, so anything drawn while it was hidden
+    // was scaled against zero. Re-fit now that it is on screen.
+    window.dispatchEvent(new Event('resize'));
+  });
+
+  // The playground starts hidden, so its first fit happened against a
+  // zero-width frame. Correct it once layout has settled.
+  requestAnimationFrame(function () {
+    window.dispatchEvent(new Event('resize'));
+  });
 })(window.CAVE);
